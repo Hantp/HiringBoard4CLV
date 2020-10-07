@@ -33,7 +33,7 @@
             margin: 10px 5px;
             padding: 10px;
             width: 100px;
-            height: 100px;
+            /* height: 100px; */
             color: black;
             background: #ff8;
             cursor: move;
@@ -41,53 +41,75 @@
             font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
             box-shadow: 2px 2px 2px #eee;
         }
+
+        .card_delete .card_save {
+            position: relative;
+            padding: 5px 15px;
+            /* top: 0px;
+            right: 0px; */
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
     <h1>Kanban Board</h1>
     
     <div id="board">
-        <div id="Applied" class="section">
+        <div id="section0" class="section" title="0">
             <h1>Applied</h1>
-            <div id="c2" class="card">Make Killer App</div>
-            <div id="c3" class="card"><em>Retire!</em></div>
+            <!-- <div id="c2" class="card">
+                <button class="card_delete" >delete</button><br>
+                Make Killer App
+                
+            </div> -->
         </div>
-        <div id="PhoneScreen" class="section">
+        <div id="section1" class="section" title="1">
             <h1>Phone Screen</h1>
-            <div id="c1" class="card">Learn HTML5</div>
         </div>
-        <div id="OnSite" class="section">
+        <div id="section2" class="section" title="2">
             <h1>On Site</h1>
         </div>
-        <div id="Offered" class="section">
+        <div id="section3" class="section" title="3">
             <h1>Offered</h1>
-            <div id="c1" class="card">Learn HTML5</div>
         </div>
-        <div id="Accpeted" class="section">
+        <div id="section4" class="section" title="4">
             <h1>Accepted</h1>
-            <div id="c1" class="card">Learn HTML5</div>
         </div>
-        <div id="Rejected" class="section">
+        <div id="section5" class="section" title="5">
             <h1>Rejected</h1>
-            <div id="c1" class="card">Learn HTML5</div>
         </div>
     </div>
 
     <form action="/action_page.php">
         <label for="name">Name:</label>
-        <input type="text" id="candidate_name" name="fname"><br><br>
-        <label for="comment">Comment</label>
-        <input type="text" id="candidate_comment" name="lname"><br><br>
-        <input type="submit" value="Submit">
-      </form>
+        <input type="text" id="candidate_name"><br><br>
+        <label for="email">Email Address:</label>
+        <input type="text" id="candidate_email"><br><br>
+        <label for="comment">Comment:</label>
+        <input type="text" id="candidate_comment"><br><br>
+        <input id="add_btn" type="submit" value="Submit">
+    </form>
 
+    <script src='/javascripts/jquery-3.2.1.min.js'></script>
     <script>
-        var cards = document.querySelectorAll('.card');
+        // var cards = document.querySelectorAll('.card');
 
-        for (var i = 0, n = cards.length; i < n; i++) {
-            var card = cards[i];
-            card.draggable = true;
-        };
+        // for (var i = 0, n = cards.length; i < n; i++) {
+        //     var card = cards[i];
+        //     card.draggable = true;
+        // };
+
+        for(let i=0 ; i<6 ; i++) {
+            var section_id = 'section' + i.toString();
+            var section = document.getElementById(section_id);
+            
+            var CardList = JSON.parse("{{CardsFromBack|json}}".replace(/&quot;/g,'"'));
+            for(let j=0 ; j<CardList[i].length ; j++) {
+                var card_id = "card_" + CardList[i][j].id.toString();
+            
+                addCard(section, CardList[i][j]);
+            }
+        }
 
         var board = document.getElementById('board');
 
@@ -158,6 +180,7 @@
                 if (card) {
                     if (section !== card.parentNode) {
                         section.appendChild(card);
+                        dropNewSection(card, section);
                     }
                 } else {
                     alert('couldn\'t find card #' + id);
@@ -177,6 +200,134 @@
             }
             return null;
         }
+
+        function dropNewSection(card, section) {
+            var section_id = section.title;
+            var card_id = card.id;
+
+            $.ajax({
+                url: "/drop",
+                method: "PUT",
+                data: { card_id: card_id, section_id: section_id}
+            }).done(function( data ) {
+                if ( data ) {
+                    if(data.status == 'error') {
+                        console.log("drop error");
+                    }
+                }
+            });
+        }
+
+        document.getElementById('add_btn').onclick = function(event){
+            event.preventDefault();
+            var name = document.getElementById('candidate_name').value;
+            var email = document.getElementById('candidate_email').value;
+            var comment = document.getElementById('candidate_comment').value;
+            console.log(name);
+            if(!name || !email || !comment){ 
+                // html.show("please finish all the blankets");
+                console.log("blank")
+            }
+            else{ 
+                $.ajax({
+                    url: "/",
+                    method: "POST",
+                    data: { name: name, email: email, comment: comment}
+                }).done(function( data ) {
+                    console.log(data)
+                    if (data && data.status == "success") {
+                        var card_id = "card_" + data.message.toString();
+                        var firstSection = document.getElementById('section0');
+
+                        var cur_card = {
+                            name: name,
+                            id: data.message,
+                            comment: comment,
+                            email: email
+                        };
+
+                        addCard(firstSection, cur_card);
+                    }
+                });
+            }
+        };    
+
+        function addCard(section, card) {
+            var new_card = document.createElement("div");
+            new_card.setAttribute('id', "card_" + card.id.toString());
+            new_card.setAttribute('class', 'card');
+        //     <label for="name">Name:</label>
+        // <input type="text" id="candidate_name"><br><br>
+            var info = document.createElement("form");
+
+            var nametag = document.createElement("label");
+            nametag.innerText = "Name: " + card.name;
+            info.appendChild(nametag);
+            info.appendChild(document.createElement("br"));
+
+            var emailtag = document.createElement("label");
+            emailtag.innerText = "Email: " + card.email;
+            info.appendChild(emailtag);
+            info.appendChild(document.createElement("br"));
+
+            new_card.appendChild(info);
+            new_card.appendChild(document.createElement("br"));
+
+            
+
+            var btn = document.createElement("button");
+            btn.setAttribute('class', 'card_save');   
+            btn.setAttribute('title', card.id.toString()); 
+            btn.innerText = "Save";
+            new_card.appendChild(btn);
+
+            var btn = document.createElement("button");
+            btn.setAttribute('class', 'card_delete');   
+            btn.setAttribute('title', card.id.toString()); 
+            btn.innerText = "Delete";
+            new_card.appendChild(btn);
+
+            new_card.draggable = true;
+            section.appendChild(new_card);
+        }
+
+        $(".card_delete").on('click', function(event){
+            event.preventDefault();
+            var curItem = $(this);
+            var id = $(this).attr("title");
+            
+            $.ajax({
+                url: "/delete",
+                method: "PUT",
+                data: { delete_id: id }
+            }).done(function( data ) {
+                if(data && data.status == "success") {
+                    console.log("fine");
+                    curItem[0].parentNode.remove();
+                } else {
+                    console.log("delete error")
+                }
+            });
+        });
+
+        $(".card_delete").on('click', function(event){
+            event.preventDefault();
+            var curItem = $(this);
+            var id = $(this).attr("title");
+            
+            $.ajax({
+                url: "/delete",
+                method: "PUT",
+                data: { delete_id: id }
+            }).done(function( data ) {
+                if(data && data.status == "success") {
+                    console.log("fine");
+                    curItem[0].parentNode.remove();
+                } else {
+                    console.log("delete error")
+                }
+            });
+        });
     </script>
 </body>
 </html>
