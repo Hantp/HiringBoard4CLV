@@ -29,7 +29,7 @@ To run natively, following setups has to be done in advance.
     npm install
     npm start (or nodemon)
 ```
- - Open the web browser (chrome) and visit https://localhost:3000/
+ - Open the web browser (chrome) and visit http://localhost:3000/
 
 ### Attention
   
