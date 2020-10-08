@@ -351,7 +351,7 @@
                         };
 
                         addCard(firstSection, cur_card);
-                        // location.reload();
+                        location.reload();
                     } else {
                         window.alert(data.message);
                     }
@@ -411,7 +411,6 @@
             new_card.setAttribute('id', "card_" + card.id.toString());
             new_card.setAttribute('class', 'card');
 
-
             var info = document.createElement("form");
 
             var nametag = document.createElement("label");
@@ -424,13 +423,13 @@
             info.appendChild(emailtag);
             info.appendChild(document.createElement("br"));
 
-            var commenttag = document.createElement("label");
+            var commenttag = document.createElement("p");
             commenttag.setAttribute('id', "card_" + card.id.toString() + "_cmt");
             commenttag.innerText = "Comment: " + card.comment;
             info.appendChild(commenttag);
             info.appendChild(document.createElement("br"));
 
-            var ratetag = document.createElement("label");
+            var ratetag = document.createElement("p");
             ratetag.setAttribute('id', "card_" + card.id.toString() + "_rate");
             ratetag.innerText = "Ave rate: " + card.ave_rate;
             info.appendChild(ratetag);
@@ -501,6 +500,7 @@
 
                             document.getElementById(card_id + "_cmt").innerText = "Comment: " + ncomment;
                             document.getElementById(card_id + "_rate").innerText = "Ave rate: " + nave_rate;
+                            location.reload();
                         } else {
                             window.alert(data.message);
                         }

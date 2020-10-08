@@ -6,17 +6,34 @@ var cookieParser  = require('cookie-parser');
 var bodyParser    = require('body-parser');
 var session       = require('express-session');
 var cons          = require('consolidate');
-var flash         = require('connect-flash');
+// var flash         = require('connect-flash');
 
-const fileUpload  = require('express-fileupload');
+// const fileUpload  = require('express-fileupload');
 const SESSION_SECRET = 'gdazus90u09djgbzpnm';
 
 var mongoose = require('mongoose');
+
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/dbusers', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false });
+
+/*
+    If running natively, connect mongoose with localhost.
+    If using Docker, connect with mongodb
+*/
+// mongoose.connect('mongodb://localhost:27017/dbusers', { 
+//     useNewUrlParser: true, 
+//     useUnifiedTopology: true, 
+//     useCreateIndex: true, 
+//     useFindAndModify: false 
+// });
+mongoose.connect('mongodb://mongodb:27017/dbusers', { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true, 
+    useCreateIndex: true, 
+    useFindAndModify: false 
+});
 
 var app = express();
-app.use(fileUpload());
+// app.use(fileUpload());
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
