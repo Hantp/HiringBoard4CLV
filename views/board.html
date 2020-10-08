@@ -110,8 +110,9 @@
         }
         
         .box{
-            width:500px; 
+            width:400px; 
             float: left;
+            /* border: solid #98bfd1; */
         }
 
     </style>
@@ -170,7 +171,7 @@
     
         <div class="box">
             <h5>Rate the candidate</h5>   
-            <input type="text" id="rate_email" placeholder="email"><br><br> 
+            <input type="text" id="rate_email" placeholder="Email address"><br><br> 
             <input type="text" id="rate_comment" placeholder="Comment"><br><br>       
             <div id="starBg" class="star_bg"> 
                 <input type="radio" id="starScore1" class="score score_1" value="1" name="rate_score">
@@ -321,10 +322,10 @@
             var name = document.getElementById('candidate_name').value;
             var email = document.getElementById('candidate_email').value;
             var comment = document.getElementById('candidate_comment').value;
-            console.log(name);
-            if(!name || !email || !comment){ 
+    
+            if(!name || !email){ 
                 console.log("blank")
-                window.alert('Please fill all the blankets.');
+                window.alert('Please type in name and email.');
             }
             else{ 
                 $.ajax({
@@ -337,15 +338,20 @@
                         var card_id = "card_" + data.message.id.toString();
                         var firstSection = document.getElementById('section0');
 
+                        var cur_comment = "";
+                        if(comment && comment != "") {
+                            cur_comment = data.message.username + ": " + comment;
+                        } 
                         var cur_card = {
                             name: name,
                             id: data.message.id,
-                            comment: data.message.username + ": " + comment,
+                            comment: cur_comment,
                             email: email,
                             ave_rate: "0"
                         };
 
                         addCard(firstSection, cur_card);
+                        // location.reload();
                     } else {
                         window.alert(data.message);
                     }
@@ -404,8 +410,8 @@
             var new_card = document.createElement("div");
             new_card.setAttribute('id', "card_" + card.id.toString());
             new_card.setAttribute('class', 'card');
-        //     <label for="name">Name:</label>
-        // <input type="text" id="candidate_name"><br><br>
+
+
             var info = document.createElement("form");
 
             var nametag = document.createElement("label");
@@ -433,12 +439,6 @@
             new_card.appendChild(info);
             new_card.appendChild(document.createElement("br"));
 
-            // var btn = document.createElement("button");
-            // btn.setAttribute('class', 'card_save');   
-            // btn.setAttribute('title', card.id.toString()); 
-            // btn.innerText = "Save";
-            // new_card.appendChild(btn);
-
             var btn = document.createElement("button");
             btn.setAttribute('class', 'card_delete');   
             btn.setAttribute('title', card.id.toString()); 
@@ -450,6 +450,7 @@
         }
 
         $(".card_delete").on('click', function(event){
+            console.log("before delete");
             event.preventDefault();
             var curItem = $(this);
             var id = $(this).attr("title");
@@ -483,7 +484,7 @@
             var comment = document.getElementById('rate_comment').value;
 
             if(!email) {
-                window.alert("Please type in the email of the candidate.");
+                window.alert("Please type in the candidate's email address.");
             } else if (selectedValue == undefined || !selectedValue) {
                 window.alert("Please rate the candidate.");
             } else {
@@ -496,7 +497,7 @@
                         if(data.status == "success") {
                             var card_id = "card_" + data.message.id.toString();
                             var ncomment = data.message.comment;
-                            var nave_rate = data.message.ave_rate;
+                            var nave_rate = data.message.ave_rate.toString();
 
                             document.getElementById(card_id + "_cmt").innerText = "Comment: " + ncomment;
                             document.getElementById(card_id + "_rate").innerText = "Ave rate: " + nave_rate;

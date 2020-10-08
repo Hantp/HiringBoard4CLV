@@ -63,12 +63,17 @@ router.post('/', async (req, res, next) => {
                 if(err) throw err;
             });
         }
+
+        var comment = "";
+        if(req.body.comment != "") {
+            comment = req.session.username + ": " + req.body.comment;
+        }
     
         var document = {
             id: id,
             name: req.body.name, 
             email: req.body.email,
-            comment: req.session.username + ": " + req.body.comment, 
+            comment: comment, 
             rate_amount: 0,
             rate_sum: 0,
             section_id: 0
