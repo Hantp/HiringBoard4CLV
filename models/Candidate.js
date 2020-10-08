@@ -21,10 +21,12 @@ var userSchema = new mongoose.Schema({
     },
 
     comment: {type: String},
-
-    stars: {type: Number},
     
-    section_id: {type: Number}
+    section_id: {type: Number},
+
+    rate_amount: {type: Number},
+
+    rate_sum: {type: Number}
 
 });
 

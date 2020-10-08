@@ -2,11 +2,11 @@ var mongoose = require('mongoose');
 
 var userSchema = new mongoose.Schema({
 
-    id: {type: Number, required: 'ID must be provided', index: {unique: true, dropDups: true}},
+    // id: {type: Number, required: 'ID must be provided', index: {unique: true, dropDups: true}},
 
-    account:    { 
+    username:    { 
         type: String,    
-        required:  [true, 'Email address cannot be left blank.'], index: {unique: true, dropDups: true}
+        required:  [true, 'Username cannot be left blank.'], index: {unique: true, dropDups: true}
     },
 
     password: { 

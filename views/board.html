@@ -32,7 +32,7 @@
             vertical-align: top;
             margin: 10px 5px;
             padding: 10px;
-            width: 100px;
+            /* width: 100px; */
             /* height: 100px; */
             color: black;
             background: #ff8;
@@ -49,11 +49,77 @@
             right: 0px; */
             font-size: 12px;
         }
+
+        /* lights on */
+        .star_bg {
+            width: 120px; height: 20px;
+            background: url(images/star.png) repeat-x;
+            position: relative;
+            overflow: hidden;
+        }
+        .star {
+            height: 100%; width: 24px;
+            line-height: 6em;
+            position: absolute;
+            z-index: 3;
+        }
+        .star:hover {    
+            background: url(images/star.png) repeat-x 0 -20px!important;
+            left: 0; z-index: 2;
+        }
+        .star_1 { left: 0; }
+        .star_2 { left: 24px; }
+        .star_3 { left: 48px; }
+        .star_4 { left: 72px; }
+        .star_5 { left: 96px; }
+        .star_1:hover { width: 24px; }
+        .star_2:hover { width: 48px; }
+        .star_3:hover { width: 72px; }
+        .star_4:hover { width: 96px; }
+        .star_5:hover { width: 120px; }
+
+        label { 
+            display: block; _display:inline;
+            height: 100%; width: 100%;
+            cursor: pointer;
+        }
+
+        .score { position: absolute; clip: rect(0 0 0 0); }
+        .score:checked + .star {    
+            background: url(images/star.png) repeat-x 0 -20px;
+            left: 0; z-index: 1;
+        }
+        .score_1:checked ~ .star_1 { width: 24px; }
+        .score_2:checked ~ .star_2 { width: 48px; }
+        .score_3:checked ~ .star_3 { width: 72px; }
+        .score_4:checked ~ .star_4 { width: 96px; }
+        .score_5:checked ~ .star_5 { width: 120px; }
+
+        .star_bg:hover .star {  background-image: none; }
+
+        /* for IE6-IE8 JS */
+        .star_checked {    
+            background: url(images/star.png) repeat-x 0 -20px;
+            left: 0; z-index: 1;
+        }
+
+        .cand {
+            width:1000px;
+            min-height:200px;
+            margin:10px auto;
+        }
+        
+        .box{
+            width:500px; 
+            float: left;
+        }
+
     </style>
 </head>
 <body>
     <h1>Kanban Board</h1>
     
+    <a href="/logout">Logout</a><br>
     <div id="board">
         <div id="section0" class="section" title="0">
             <h1>Applied</h1>
@@ -80,16 +146,48 @@
         </div>
     </div>
 
-    <form action="/action_page.php">
-        <label for="name">Name:</label>
-        <input type="text" id="candidate_name"><br><br>
-        <label for="email">Email Address:</label>
-        <input type="text" id="candidate_email"><br><br>
-        <label for="comment">Comment:</label>
-        <input type="text" id="candidate_comment"><br><br>
-        <input id="add_btn" type="submit" value="Submit">
-    </form>
-
+    <div class="cand">
+        <div class="box">
+            <form>
+                <label for="name">Name:</label>
+                <input type="text" id="candidate_name"><br><br>
+        
+                <label for="email">Email Address:</label>
+                <input type="text" id="candidate_email"><br><br>
+        
+                <label for="comment">Comment:</label>
+                <input type="text" id="candidate_comment"><br><br>
+        
+                <!-- <label for="resume">Resume:</label> -->
+                <!-- <input type="file" id="uploader" name="file"><br><br> -->
+                <!-- <form id='uploadForm' enctype="multipart/form-data">
+                    <input type="file" name="file" id="uploader" />
+                </form>  -->
+        
+                <input id="add_btn" type="submit" value="Add new candidate">
+            </form>
+        </div>
+    
+        <div class="box">
+            <h5>Rate the candidate</h5>   
+            <input type="text" id="rate_email" placeholder="email"><br><br> 
+            <input type="text" id="rate_comment" placeholder="Comment"><br><br>       
+            <div id="starBg" class="star_bg"> 
+                <input type="radio" id="starScore1" class="score score_1" value="1" name="rate_score">
+                <a href="#starScore1" class="star star_1" title="TooBad"><label for="starScore1">Too bad</label></a>
+                <input type="radio" id="starScore2" class="score score_2" value="2" name="rate_score">
+                <a href="#starScore2" class="star star_2" title="Bad"><label for="starScore2">Bad</label></a>
+                <input type="radio" id="starScore3" class="score score_3" value="3" name="rate_score">
+                <a href="#starScore3" class="star star_3" title="Normal"><label for="starScore3">Normal</label></a>
+                <input type="radio" id="starScore4" class="score score_4" value="4" name="rate_score">
+                <a href="#starScore4" class="star star_4" title="Good"><label for="starScore4">Good</label></a>
+                <input type="radio" id="starScore5" class="score score_5" value="5" name="rate_score">
+                <a href="#5" class="star star_5" title="VeryGood"><label for="starScore5">Very good</label></a>
+            </div> <br><br>
+            <button id="rate_btn">Submit</button>
+        </div>
+    </div>
+    
     <script src='/javascripts/jquery-3.2.1.min.js'></script>
     <script>
         // var cards = document.querySelectorAll('.card');
@@ -102,8 +200,8 @@
         for(let i=0 ; i<6 ; i++) {
             var section_id = 'section' + i.toString();
             var section = document.getElementById(section_id);
-            
-            var CardList = JSON.parse("{{CardsFromBack|json}}".replace(/&quot;/g,'"'));
+        
+            var CardList = JSON.parse("{{CardsFromBack|json}}".replace(/&quot;/g,'"').replace(/\n/g,"\\n"));
             for(let j=0 ; j<CardList[i].length ; j++) {
                 var card_id = "card_" + CardList[i][j].id.toString();
             
@@ -206,7 +304,7 @@
             var card_id = card.id;
 
             $.ajax({
-                url: "/drop",
+                url: "/board/drop",
                 method: "PUT",
                 data: { card_id: card_id, section_id: section_id}
             }).done(function( data ) {
@@ -225,32 +323,82 @@
             var comment = document.getElementById('candidate_comment').value;
             console.log(name);
             if(!name || !email || !comment){ 
-                // html.show("please finish all the blankets");
                 console.log("blank")
+                window.alert('Please fill all the blankets.');
             }
             else{ 
                 $.ajax({
-                    url: "/",
+                    url: "/board",
                     method: "POST",
                     data: { name: name, email: email, comment: comment}
                 }).done(function( data ) {
                     console.log(data)
                     if (data && data.status == "success") {
-                        var card_id = "card_" + data.message.toString();
+                        var card_id = "card_" + data.message.id.toString();
                         var firstSection = document.getElementById('section0');
 
                         var cur_card = {
                             name: name,
-                            id: data.message,
-                            comment: comment,
-                            email: email
+                            id: data.message.id,
+                            comment: data.message.username + ": " + comment,
+                            email: email,
+                            ave_rate: "0"
                         };
 
                         addCard(firstSection, cur_card);
+                    } else {
+                        window.alert(data.message);
                     }
                 });
+                // UploadFile();
             }
         };    
+
+        // function UploadFile() {
+        //     var fileObj = document.getElementById("uploader").files[0]; 
+        //     var form = new FormData(); 
+        //     form.append("file", fileObj); 
+ 
+        //     var url =  "http://localhost:3000/upload";  
+        //     xhr = new XMLHttpRequest(); 
+        //     xhr.open("post", url, true);
+        //     xhr.onload = uploadComplete; 
+        //     xhr.onerror = uploadFailed; 
+        //     xhr.upload.onloadstart = function(){
+        //         ot = new Date().getTime();   
+        //         oloaded = 0;
+        //     };
+ 
+        //     xhr.send(form); 
+
+        //     // $.ajax({
+        //     //     url: "/upload",
+        //     //     type: 'POST',
+        //     //     cache: false,
+        //     //     data: new FormData($("#uploadForm")[0]),
+        //     //     processData: false,
+        //     //     contentType: false,
+        //     //     success: function (result) {
+        //     //         console.log(result);
+        //     //     },
+        //     //     error: function (err) {
+        //     //         copnsole.log(err);
+        //     //     }
+        //     // });
+        // }
+
+        // function uploadComplete(evt) {
+        //     // var data = JSON.parse(evt.target.responseText);
+        //     // if(data.success) {
+        //     //     alert("上传成功！");
+        //     // }else{
+        //     //     alert("上传失败！");
+        //     // }
+        // }
+  
+        // function uploadFailed(evt) {
+        //     // alert("上传失败！");
+        // }
 
         function addCard(section, card) {
             var new_card = document.createElement("div");
@@ -270,16 +418,26 @@
             info.appendChild(emailtag);
             info.appendChild(document.createElement("br"));
 
+            var commenttag = document.createElement("label");
+            commenttag.setAttribute('id', "card_" + card.id.toString() + "_cmt");
+            commenttag.innerText = "Comment: " + card.comment;
+            info.appendChild(commenttag);
+            info.appendChild(document.createElement("br"));
+
+            var ratetag = document.createElement("label");
+            ratetag.setAttribute('id', "card_" + card.id.toString() + "_rate");
+            ratetag.innerText = "Ave rate: " + card.ave_rate;
+            info.appendChild(ratetag);
+            info.appendChild(document.createElement("br"));
+
             new_card.appendChild(info);
             new_card.appendChild(document.createElement("br"));
 
-            
-
-            var btn = document.createElement("button");
-            btn.setAttribute('class', 'card_save');   
-            btn.setAttribute('title', card.id.toString()); 
-            btn.innerText = "Save";
-            new_card.appendChild(btn);
+            // var btn = document.createElement("button");
+            // btn.setAttribute('class', 'card_save');   
+            // btn.setAttribute('title', card.id.toString()); 
+            // btn.innerText = "Save";
+            // new_card.appendChild(btn);
 
             var btn = document.createElement("button");
             btn.setAttribute('class', 'card_delete');   
@@ -297,7 +455,7 @@
             var id = $(this).attr("title");
             
             $.ajax({
-                url: "/delete",
+                url: "/board/delete",
                 method: "PUT",
                 data: { delete_id: id }
             }).done(function( data ) {
@@ -310,23 +468,46 @@
             });
         });
 
-        $(".card_delete").on('click', function(event){
+        $("#rate_btn").on('click', function(event){
             event.preventDefault();
-            var curItem = $(this);
-            var id = $(this).attr("title");
-            
-            $.ajax({
-                url: "/delete",
-                method: "PUT",
-                data: { delete_id: id }
-            }).done(function( data ) {
-                if(data && data.status == "success") {
-                    console.log("fine");
-                    curItem[0].parentNode.remove();
-                } else {
-                    console.log("delete error")
+            const rbs = document.querySelectorAll('input[name="rate_score"]');
+            let selectedValue;
+            for (const rb of rbs) {
+                if (rb.checked) {
+                    selectedValue = rb.value;
+                    break;
                 }
-            });
+            }
+
+            var email = document.getElementById('rate_email').value;
+            var comment = document.getElementById('rate_comment').value;
+
+            if(!email) {
+                window.alert("Please type in the email of the candidate.");
+            } else if (selectedValue == undefined || !selectedValue) {
+                window.alert("Please rate the candidate.");
+            } else {
+                $.ajax({
+                    url: "/board/rate",
+                    method: "POST",
+                    data: { email: email, comment: comment, value: selectedValue }
+                }).done(function( data ) {
+                    if(data) {
+                        if(data.status == "success") {
+                            var card_id = "card_" + data.message.id.toString();
+                            var ncomment = data.message.comment;
+                            var nave_rate = data.message.ave_rate;
+
+                            document.getElementById(card_id + "_cmt").innerText = "Comment: " + ncomment;
+                            document.getElementById(card_id + "_rate").innerText = "Ave rate: " + nave_rate;
+                        } else {
+                            window.alert(data.message);
+                        }
+                    } 
+                });
+            }
+            
+            
         });
     </script>
 </body>

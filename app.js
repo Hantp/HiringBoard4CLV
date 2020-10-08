@@ -8,6 +8,7 @@ var session       = require('express-session');
 var cons          = require('consolidate');
 var flash         = require('connect-flash');
 
+const fileUpload  = require('express-fileupload');
 const SESSION_SECRET = 'gdazus90u09djgbzpnm';
 
 var mongoose = require('mongoose');
@@ -15,6 +16,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost:27017/dbusers', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false });
 
 var app = express();
+app.use(fileUpload());
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
@@ -46,17 +48,16 @@ app.use(session({
   cookie: {maxAge: 1000 * 60 * 60 * 24}
 }));
 
-// app.use(function(req, res, next) {
-//   var url = req.originalUrl;
-//   if (url != '/' && url != '/register' && !req.session.userinfo) {
-//     return res.redirect('/');
-//   }
-//   next();
-// });
+app.use(function(req, res, next) {
+  var url = req.originalUrl;
+  if (url != '/' && url != '/register' && !req.session.username) {
+    return res.redirect('/');
+  }
+  next();
+});
 
-app.use('/', require('./routes/board'));
-// app.use('/', require('./routes/index'));
-
+app.use('/', require('./routes/index'));
+app.use('/board', require('./routes/board'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

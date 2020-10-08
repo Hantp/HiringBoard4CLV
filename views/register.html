@@ -42,7 +42,7 @@
             box-shadow: 2px 2px 2px #eee;
         }
 
-        #login_btn {
+        #register_btn {
             /* background-color: #4CAF50; Green */
             /* border: none; */
             /* color: white; */
@@ -59,41 +59,41 @@
     
     <form>
         <label>Username:</label>
-        <input type="text" id="login_username" placeholder="Username"><br><br>
+        <input type="text" id="register_username" placeholder="Username"><br><br>
         <label>Password:</label>
-        <input type="password" id="login_password" placeholder="Password"><br><br>
-        <a href="/register">Register</a><br>
-        <button id="login_btn">Login</button>
+        <input type="password" id="register_password" placeholder="Password"><br><br>
+        <label>Confirm Password:</label>
+        <input type="password" id="register_confirm_password" placeholder="Confirm password"><br><br>
+        <a href="/">Login</a><br>
+        <button id="register_btn">Register</button>
     </form>
 
     <script src='/javascripts/jquery-3.2.1.min.js'></script>
     <script>
-        var login_btn = document.getElementById('login_btn');
-
-        login_btn.onclick = function(event){
+        var register_btn = document.getElementById('register_btn');
+        register_btn.onclick = function(event){
             event.preventDefault();
 
-            var username = $("#login_username").val();
-            var password = $("#login_password").val();
+            var username = $("#register_username").val();
+            var password = $("#register_password").val();
+            var cpassword = $("#register_confirm_password").val();
         
-            console.log(username);
-            if(!username || !password)
+            if(!username || !password || !cpassword)
             {
-                window.alert("Please type in username and password");
+                window.alert("Please fill all the blankets");
+            } else if (password != cpassword)  {
+                window.alert("Password and confirm password don't match");
             } else {
                 
                 $.ajax({
-                    url: "/",
+                    url: "/register",
                     method: "POST",
                     data: { username: username, password: password}
                 }).done(function( data ) {
-                    if ( data ) {
-                        console.log(123);
-                        if(data.message = "success") {
-                            window.location = "/board";  
-                        } else {
-                            window.alert(data.message);
-                        }
+                    if ( data && data.message == "success" ) {
+                        window.location = "/";  
+                    } else {
+                        window.alert(data.message);
                     }
                 });
             }
