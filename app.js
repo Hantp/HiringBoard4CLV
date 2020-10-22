@@ -19,18 +19,18 @@ mongoose.Promise = global.Promise;
     If running natively, connect mongoose with localhost.
     If using Docker, connect with mongodb
 */
-// mongoose.connect('mongodb://localhost:27017/dbusers', { 
-//     useNewUrlParser: true, 
-//     useUnifiedTopology: true, 
-//     useCreateIndex: true, 
-//     useFindAndModify: false 
-// });
-mongoose.connect('mongodb://mongodb:27017/dbusers', { 
+mongoose.connect('mongodb://localhost:27017/dbusers', { 
     useNewUrlParser: true, 
     useUnifiedTopology: true, 
     useCreateIndex: true, 
     useFindAndModify: false 
 });
+// mongoose.connect('mongodb://mongodb:27017/dbusers', { 
+//     useNewUrlParser: true, 
+//     useUnifiedTopology: true, 
+//     useCreateIndex: true, 
+//     useFindAndModify: false 
+// });
 
 var app = express();
 // app.use(fileUpload());
